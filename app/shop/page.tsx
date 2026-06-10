@@ -2,8 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import { db } from "@/lib/firebase"
-import { collection, getDocs } from "firebase/firestore"
+import { apiFetch } from "@/lib/api"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { useCart } from "@/context/cart-context"
@@ -38,12 +37,8 @@ function ShopCatalogContent() {
     async function loadProducts() {
       setLoading(true)
       try {
-        const querySnapshot = await getDocs(collection(db, "products"))
-        const docs = querySnapshot.docs.map(doc => ({
-          ...doc.data(),
-          id: doc.id
-        }))
-        setProductsList(docs.sort((a: any, b: any) => Number(a.id) - Number(b.id)))
+        const docs = await apiFetch("/products")
+        setProductsList(docs)
       } catch (e) {
         console.error("Failed to load shop products:", e)
       } finally {

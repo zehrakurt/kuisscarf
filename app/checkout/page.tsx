@@ -10,6 +10,7 @@ import { ShoppingBag, ArrowLeft, ShieldCheck, Loader2 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { toast } from "sonner"
+import { apiFetch } from "@/lib/api"
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal, cartCount } = useCart()
@@ -49,26 +50,16 @@ export default function CheckoutPage() {
 
     setLoading(true)
     try {
-      // Send shipping details and cart items to the server-side Shopier redirect generator
-      const res = await fetch("/api/iyzico", {
+      // Send shipping details and cart items to the NestJS payments endpoint
+      const data = await apiFetch("/payments/iyzico", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           shippingInfo: formData,
           items: cartItems,
           total: finalTotal,
         }),
       })
-
-      if (!res.ok) {
-        const errData = await res.json()
-        throw new Error(errData.error || "Ödeme oturumu başlatılamadı.")
-      }
-
-      const data = await res.json()
-
+      
       if (data.paymentPageUrl) {
         // Redirect the user's browser directly to iyzico hosted 3D Secure payment page
         window.location.href = data.paymentPageUrl

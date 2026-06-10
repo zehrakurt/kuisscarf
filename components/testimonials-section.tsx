@@ -9,7 +9,7 @@ const testimonials = [
     location: "İstanbul",
     rating: 5,
     text: "İpek şallarının kalitesi muhteşem! Hem yumuşak hem de dayanıklı. Her rengi birbirinden güzel.",
-    product: "İpek Krem Şal",
+    product: "Dior Yeşil Şal",
   },
   {
     id: 2,
@@ -17,15 +17,15 @@ const testimonials = [
     location: "Ankara",
     rating: 5,
     text: "Kargo çok hızlı geldi ve paketleme gerçekten özenli. Ürünler tam beklediğim gibi çıktı.",
-    product: "Modal Pembe Şal",
+    product: "İmannoor Siyah Şal",
   },
   {
     id: 3,
     name: "Zeynep A.",
-    location: "İzmir",
+    location: "İstanbul",
     rating: 5,
     text: "Artık şal ihtiyacım için tek adresim burası. Renk seçenekleri ve kalite mükemmel!",
-    product: "Pamuk Yeşil Şal",
+    product: "İmannoor Bordo Şal",
   },
 ]
 
@@ -46,13 +46,13 @@ export function TestimonialsSection() {
         {/* Testimonials grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial) => (
-            <div 
+            <div
               key={testimonial.id}
               className="bg-card p-8 rounded-xl border border-border relative"
             >
               {/* Quote icon */}
               <Quote className="h-10 w-10 text-primary/20 absolute top-6 right-6" />
-              
+
               {/* Rating */}
               <div className="flex gap-1 mb-6">
                 {[...Array(testimonial.rating)].map((_, i) => (

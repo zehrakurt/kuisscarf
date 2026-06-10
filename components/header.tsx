@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart-sheet"
 import { FavoritesSheet } from "@/components/favorites-sheet"
-import { db } from "@/lib/firebase"
-import { collection, getDocs } from "firebase/firestore"
+import { apiFetch } from "@/lib/api"
 
 const navigation = [
   { name: "Yeni Gelenler", href: "/shop?category=Yeni%20Gelenler" },
@@ -37,11 +36,7 @@ export function Header() {
     if (isSearchOpen && products.length === 0) {
       const fetchProducts = async () => {
         try {
-          const querySnapshot = await getDocs(collection(db, "products"))
-          const list = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }))
+          const list = await apiFetch("/products")
           setProducts(list)
         } catch (e) {
           console.error("Search fetch products failed:", e)

@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { auth } from "@/lib/firebase"
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth"
+import { apiFetch } from "@/lib/api"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,14 +18,24 @@ export default function AdminLoginPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        router.push("/admin")
-      } else {
-        setCheckingAuth(false)
-      }
-    })
-    return () => unsubscribe()
+    const token = localStorage.getItem("adminToken")
+    if (token) {
+      apiFetch("/auth/me")
+        .then((user) => {
+          if (user && user.role === "ADMIN") {
+            router.push("/admin")
+          } else {
+            localStorage.removeItem("adminToken")
+            setCheckingAuth(false)
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem("adminToken")
+          setCheckingAuth(false)
+        })
+    } else {
+      setCheckingAuth(false)
+    }
   }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -38,12 +47,21 @@ export default function AdminLoginPage() {
 
     setLoading(true)
     try {
-      await signInWithEmailAndPassword(auth, email, password)
-      toast.success("Giriş başarılı! Yönlendiriliyorsunuz...")
-      router.push("/admin")
+      const data = await apiFetch("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      })
+      if (data.user && data.user.role === "ADMIN") {
+        localStorage.setItem("adminToken", data.access_token)
+        toast.success("Giriş başarılı! Yönlendiriliyorsunuz...")
+        router.push("/admin")
+      } else {
+        toast.error("Bu panele yetkiniz bulunmamaktadır.")
+        setLoading(false)
+      }
     } catch (error: any) {
       console.error("Login Error:", error)
-      toast.error("Giriş başarısız. Bilgilerinizi kontrol edin.")
+      toast.error(error.message || "Giriş başarısız. Bilgilerinizi kontrol edin.")
       setLoading(false)
     }
   }

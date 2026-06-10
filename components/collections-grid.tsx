@@ -4,8 +4,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
-import { collection, getDocs } from "firebase/firestore"
-import { db } from "@/lib/firebase"
+import { apiFetch } from "@/lib/api"
 
 const collectionsConfig = [
   {
@@ -44,14 +43,13 @@ export function CollectionsGrid() {
   useEffect(() => {
     async function getProductCounts() {
       try {
-        const querySnapshot = await getDocs(collection(db, "products"))
+        const products = await apiFetch("/products")
         const productCounts: { [key: string]: number } = {
           "Gucci Şal": 0,
           "İmannoor Şal": 0,
           "Coach Şal": 0,
         }
-        querySnapshot.forEach((doc) => {
-          const data = doc.data()
+        products.forEach((data: any) => {
           if (data.categories && Array.isArray(data.categories)) {
             data.categories.forEach((cat: string) => {
               if (cat && cat in productCounts) {

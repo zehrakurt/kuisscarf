@@ -65,8 +65,7 @@ const products = [
   },
 ]
 
-import { collection, getDocs, setDoc, doc } from "firebase/firestore"
-import { db } from "@/lib/firebase"
+import { apiFetch } from "@/lib/api"
 
 export function ProductsSection() {
   const [productsList, setProductsList] = useState<any[]>([])
@@ -95,16 +94,10 @@ export function ProductsSection() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        const querySnapshot = await getDocs(collection(db, "products"))
-        const docs = querySnapshot.docs.map(doc => ({
-          ...doc.data(),
-          id: doc.id
-        }))
-        
-        // Sort products by id to keep consistent display
-        setProductsList(docs.sort((a: any, b: any) => Number(a.id) - Number(b.id)))
+        const docs = await apiFetch("/products")
+        setProductsList(docs)
       } catch (e) {
-        console.error("Failed to load products from Firebase:", e)
+        console.error("Failed to load products from API:", e)
         setProductsList([])
       } finally {
         setLoading(false)

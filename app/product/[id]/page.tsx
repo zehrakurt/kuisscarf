@@ -4,8 +4,7 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { db } from "@/lib/firebase"
-import { doc, getDoc, collection, getDocs } from "firebase/firestore"
+import { apiFetch } from "@/lib/api"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { useCart } from "@/context/cart-context"
@@ -63,27 +62,15 @@ export default function ProductDetailPage() {
       if (!productId) return
       setLoading(true)
       try {
-        // 1. Fetch current product from Firestore
-        const docRef = doc(db, "products", productId)
-        const docSnap = await getDoc(docRef)
+        // 1. Fetch current product from NestJS API
+        const currentProduct = await apiFetch(`/products/${productId}`)
+        setProduct(currentProduct)
+        setActiveImage(currentProduct.image || "/images/placeholder.jpg")
 
-        if (docSnap.exists()) {
-          const currentProduct: any = { ...docSnap.data(), id: docSnap.id }
-          setProduct(currentProduct)
-          setActiveImage(currentProduct.image || "/images/placeholder.jpg")
-
-          // 2. Fetch related products from Firestore
-          const querySnapshot = await getDocs(collection(db, "products"))
-          const allDocs = querySnapshot.docs.map(doc => ({
-            ...doc.data(),
-            id: doc.id
-          }))
-
-          const others = allDocs.filter((p: any) => p.id !== productId).slice(0, 4)
-          setRelatedProducts(others)
-        } else {
-          setProduct(null)
-        }
+        // 2. Fetch related products from NestJS API
+        const allDocs = await apiFetch("/products")
+        const others = allDocs.filter((p: any) => p.id !== productId).slice(0, 4)
+        setRelatedProducts(others)
       } catch (error) {
         console.error("Error loading product detail page:", error)
         setProduct(null)

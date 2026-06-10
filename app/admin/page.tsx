@@ -1,20 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { auth, db, storage } from "@/lib/firebase"
-import { signOut, onAuthStateChanged } from "firebase/auth"
+import { apiFetch } from "@/lib/api"
 import { useRouter } from "next/navigation"
-import { 
-  collection, 
-  getDocs, 
-  doc, 
-  updateDoc, 
-  deleteDoc, 
-  setDoc, 
-  query, 
-  orderBy 
-} from "firebase/firestore"
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -87,27 +75,33 @@ export default function AdminDashboardPage() {
 
   // Auth check
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user)
-        setLoadingUser(false)
-      } else {
+    const token = localStorage.getItem("adminToken")
+    if (!token) {
+      router.push("/admin/login")
+      return
+    }
+
+    apiFetch("/auth/me")
+      .then((data) => {
+        if (data && data.role === "ADMIN") {
+          setUser(data)
+          setLoadingUser(false)
+        } else {
+          localStorage.removeItem("adminToken")
+          router.push("/admin/login")
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem("adminToken")
         router.push("/admin/login")
-      }
-    })
-    return () => unsubscribe()
+      })
   }, [router])
 
   // Load orders
   const loadOrders = async () => {
     setLoadingOrders(true)
     try {
-      const q = query(collection(db, "orders"), orderBy("createdAt", "desc"))
-      const querySnapshot = await getDocs(q)
-      const data = querySnapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-      }))
+      const data = await apiFetch("/orders")
       setOrders(data)
     } catch (e) {
       console.error("Failed to load orders:", e)
@@ -121,12 +115,8 @@ export default function AdminDashboardPage() {
   const loadProducts = async () => {
     setLoadingProducts(true)
     try {
-      const querySnapshot = await getDocs(collection(db, "products"))
-      const data = querySnapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-      }))
-      setProductsList(data.sort((a, b) => Number(a.id) - Number(b.id)))
+      const data = await apiFetch("/products")
+      setProductsList(data)
     } catch (e) {
       console.error("Failed to load products:", e)
       toast.error("Ürünler yüklenirken hata oluştu.")
@@ -144,25 +134,27 @@ export default function AdminDashboardPage() {
   }, [activeTab, user])
 
   const handleLogout = async () => {
-    try {
-      await signOut(auth)
-      toast.success("Oturum kapatıldı.")
-      router.push("/admin/login")
-    } catch (e) {
-      toast.error("Çıkış yapılırken hata oluştu.")
-    }
+    localStorage.removeItem("adminToken")
+    toast.success("Oturum kapatıldı.")
+    router.push("/admin/login")
   }
 
   // Update order status
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      const orderRef = doc(db, "orders", orderId)
-      await updateDoc(orderRef, { status: newStatus })
+      let statusEnum = newStatus.toUpperCase();
+      if (statusEnum === "CANCELED") statusEnum = "FAILED";
+      
+      await apiFetch(`/orders/${orderId}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: statusEnum }),
+      })
       toast.success(`Sipariş durumu "${newStatus}" olarak güncellendi.`)
+      
       // Refresh local state
-      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: statusEnum } : o))
       if (selectedOrder && selectedOrder.id === orderId) {
-        setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }))
+        setSelectedOrder((prev: any) => ({ ...prev, status: statusEnum }))
       }
     } catch (e) {
       toast.error("Sipariş durumu güncellenemedi.")
@@ -185,18 +177,15 @@ export default function AdminDashboardPage() {
       const formData = new FormData()
       formData.append("file", file)
 
-      const response = await fetch("/api/upload", {
+      const data = await apiFetch("/uploads", {
         method: "POST",
         body: formData,
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Sunucuya yükleme başarısız oldu.")
-      }
-
-      const data = await response.json()
-      return data.url
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL 
+        ? process.env.NEXT_PUBLIC_API_URL.replace("/api", "") 
+        : "http://localhost:3001";
+      return `${backendUrl}${data.url}`;
     } catch (e: any) {
       console.error(`Local upload failed for file ${file.name}:`, e)
       toast.error(`"${file.name}" görseli yüklenirken hata oluştu: ${e.message || "Bilinmeyen hata"}`)
@@ -237,7 +226,9 @@ export default function AdminDashboardPage() {
   const handleDeleteProduct = async (id: string) => {
     if (!confirm("Bu ürünü silmek istediğinize emin misiniz?")) return
     try {
-      await deleteDoc(doc(db, "products", id))
+      await apiFetch(`/products/${id}`, {
+        method: "DELETE",
+      })
       toast.success("Ürün silindi.")
       setProductsList(prev => prev.filter(p => p.id !== id))
     } catch (e) {
@@ -346,7 +337,17 @@ export default function AdminDashboardPage() {
         categories: selectedCategories,
       }
 
-      await setDoc(doc(db, "products", productForm.id), updatedProduct)
+      if (editingProduct) {
+        await apiFetch(`/products/${productForm.id}`, {
+          method: "PUT",
+          body: JSON.stringify(updatedProduct),
+        })
+      } else {
+        await apiFetch("/products", {
+          method: "POST",
+          body: JSON.stringify(updatedProduct),
+        })
+      }
       
       toast.success(editingProduct ? "Ürün güncellendi!" : "Yeni ürün eklendi!", { id: toastId })
       cancelEditProduct()
