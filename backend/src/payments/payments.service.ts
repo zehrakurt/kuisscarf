@@ -1,44 +1,60 @@
 import { Injectable } from '@nestjs/common';
-import Iyzipay from 'iyzipay';
-import { OrdersService } from '../orders/orders.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class PaymentsService {
-  private iyzipay: any;
+  private merchantId: string;
+  private merchantKey: string;
+  private merchantSalt: string;
+  private testMode: string;
 
-  constructor(private ordersService: OrdersService) {
-    const apiKey = process.env.IYZICO_API_KEY || '';
-    const secretKey = process.env.IYZICO_SECRET_KEY || '';
-    const baseUrl = process.env.IYZICO_BASE_URL || 'https://sandbox-api.iyzipay.com';
-
-    this.iyzipay = new Iyzipay({
-      apiKey: apiKey || 'dummy-api-key',
-      secretKey: secretKey || 'dummy-secret-key',
-      uri: baseUrl,
-    });
+  constructor() {
+    this.merchantId = process.env.PAYTR_MERCHANT_ID || '';
+    this.merchantKey = process.env.PAYTR_MERCHANT_KEY || '';
+    this.merchantSalt = process.env.PAYTR_MERCHANT_SALT || '';
+    this.testMode = process.env.PAYTR_TEST_MODE || '1';
   }
 
-  async createIyzipayCheckout(request: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.iyzipay.checkoutForm.create(request, (err: any, result: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
+  generatePaytrToken(payload: {
+    userIp: string;
+    merchantOid: string;
+    email: string;
+    paymentAmount: string;
+    userBasket: string;
+    noInstallment: string;
+    maxInstallment: string;
+    currency: string;
+  }): string {
+    const hashStr =
+      this.merchantId +
+      payload.userIp +
+      payload.merchantOid +
+      payload.email +
+      payload.paymentAmount +
+      payload.userBasket +
+      payload.noInstallment +
+      payload.maxInstallment +
+      payload.currency +
+      this.testMode;
+
+    return crypto
+      .createHmac('sha256', this.merchantKey)
+      .update(hashStr + this.merchantSalt)
+      .digest('base64');
   }
 
-  async retrieveIyzipayResult(request: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.iyzipay.checkoutForm.retrieve(request, (err: any, result: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
+  verifyPaytrCallback(payload: {
+    merchantOid: string;
+    status: string;
+    totalAmount: string;
+    hash: string;
+  }): boolean {
+    const hashStr = payload.merchantOid + this.merchantSalt + payload.status + payload.totalAmount;
+    const generatedHash = crypto
+      .createHmac('sha256', this.merchantKey)
+      .update(hashStr)
+      .digest('base64');
+
+    return generatedHash === payload.hash;
   }
 }

@@ -51,7 +51,7 @@ export default function CheckoutPage() {
     setLoading(true)
     try {
       // Send shipping details and cart items to the NestJS payments endpoint
-      const data = await apiFetch("/payments/iyzico", {
+      const data = await apiFetch("/payments/paytr", {
         method: "POST",
         body: JSON.stringify({
           shippingInfo: formData,
@@ -61,7 +61,7 @@ export default function CheckoutPage() {
       })
       
       if (data.paymentPageUrl) {
-        // Redirect the user's browser directly to iyzico hosted 3D Secure payment page
+        // Redirect the user's browser directly to PayTR hosted 3D Secure payment page
         window.location.href = data.paymentPageUrl
       } else {
         throw new Error("Ödeme yönlendirme adresi alınamadı.")
@@ -286,8 +286,8 @@ export default function CheckoutPage() {
                 <div className="flex gap-3">
                   <ShieldCheck className="h-8 w-8 text-accent flex-shrink-0" />
                   <div>
-                    <span className="font-semibold text-foreground block mb-0.5">iyzico Güvencesiyle Ödeme</span>
-                    Ödemeniz 256-bit SSL güvenlik korumasıyla 3D Secure onaylı olarak iyzico üzerinden güvenli bir şekilde alınmaktadır.
+                    <span className="font-semibold text-foreground block mb-0.5">PayTR Güvencesiyle Ödeme</span>
+                    Ödemeniz 256-bit SSL güvenlik korumasıyla 3D Secure onaylı olarak PayTR üzerinden güvenli bir şekilde alınmaktadır.
                   </div>
                 </div>
                 <div className="flex items-center gap-2 pt-2.5 border-t border-border/40 justify-center">
