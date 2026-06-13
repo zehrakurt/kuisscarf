@@ -42,15 +42,15 @@ export function HeroSection() {
             Premium kalite pamuk şallarla tarzınızı yansıtın.
             Türkiye&apos;nin en seçkin hijab koleksiyonu.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row items-start gap-4">
             <Button
               asChild
               size="lg"
-              className="group text-base tracking-wider px-8 py-6 bg-primary hover:bg-primary/90"
+              className="group text-sm sm:text-base tracking-wider px-6 sm:px-8 py-4 sm:py-6 bg-primary hover:bg-primary/90 w-fit"
             >
               <Link href="/shop?category=İmannoor%20Şal">
                 KOLEKSİYONU KEŞFEDİN
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
           </div>
