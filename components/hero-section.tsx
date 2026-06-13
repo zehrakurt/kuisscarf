@@ -10,11 +10,20 @@ export function HeroSection() {
     <section className="relative min-h-[90vh] flex items-center">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
+        {/* Desktop Image */}
         <Image
           src="/images/banner.png"
-          alt="Kuisscarf Hero"
+          alt="Kuisscarf Hero Desktop"
           fill
-          className="object-cover object-center"
+          className="hidden md:block object-cover object-center"
+          priority
+        />
+        {/* Mobile Image */}
+        <Image
+          src="/images/mobil.png"
+          alt="Kuisscarf Hero Mobile"
+          fill
+          className="block md:hidden object-cover object-center"
           priority
         />
       </div>
