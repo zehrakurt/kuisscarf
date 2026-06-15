@@ -78,7 +78,7 @@ const legalTexts: { [key: string]: { title: string; content: string[] } } = {
   mesafeli: {
     title: "Mesafeli Satış Sözleşmesi",
     content: [
-      "1. TARAFLAR: İşbu sözleşme KUISSCARF (Fatmatüzzehra Kurt - Eyüp, İstanbul) ile web sitesinden sipariş veren ALICI (Müşteri) arasında, sipariş esnasında girilen bilgiler doğrultusunda akdedilmiştir.",
+      "1. TARAFLAR: İşbu sözleşme KUISSCARF (Eyüp, İstanbul) ile web sitesinden sipariş veren ALICI (Müşteri) arasında, sipariş esnasında girilen bilgiler doğrultusunda akdedilmiştir.",
       "2. SÖZLEŞMENİN KONUSU: Sözleşmenin konusu, ALICI'nın SATICI'ya ait web sitesinden elektronik ortamda siparişini verdiği ürünün satışı ve teslimi ile ilgili olarak 6502 sayılı Tüketicinin Korunması Hakkında Kanun hükümleri gereğince tarafların hak ve yükümlülüklerinin saptanmasıdır.",
       "3. ÜRÜN VE TESLİMAT: Sipariş edilen ürünler, ALICI'nın belirttiği adrese kargo vasıtasıyla teslim edilir. Kargo ücreti 2000 TL altı siparişlerde 200 TL olup ALICI tarafından ödenir. 2000 TL üzeri siparişlerde kargo ücretsizdir.",
       "4. CAYMA HAKKI: Şal ve eşarp ürünleri doğrudan ten ve saç ile temas eden hijyen ve kişisel kullanım ürünleri sınıfına girdiğinden, ambalajı veya koruma bandı açılmış, kullanılmış ürünlerde mevzuat gereği cayma hakkı (iade ve değişim) kullanılamaz.",
