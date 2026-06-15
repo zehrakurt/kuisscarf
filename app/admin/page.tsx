@@ -656,16 +656,17 @@ export default function AdminDashboardPage() {
                       <div className="space-y-4">
                         <div className="space-y-1.5">
                           <Label>Görsel Yükle (Bilgisayardan)</Label>
-                          <label className="flex flex-col items-center justify-center border border-dashed border-border hover:bg-muted/40 cursor-pointer py-4 rounded-lg transition-colors">
+                          <label htmlFor="prod-image-file" className="flex flex-col items-center justify-center border border-dashed border-border hover:bg-muted/40 cursor-pointer py-4 rounded-lg transition-colors">
                             <Upload className="h-5 w-5 text-muted-foreground mb-1 animate-pulse" />
                             <span className="text-xs text-muted-foreground font-semibold">Fotoğraf Seçin (Çoklu Seçim Desteklenir)</span>
                             <input 
+                              id="prod-image-file"
                               type="file" 
                               accept="image/*" 
                               multiple
                               disabled={uploadingImage}
                               onChange={handleFileChange}
-                              className="hidden" 
+                              className="sr-only" 
                             />
                           </label>
                         </div>
