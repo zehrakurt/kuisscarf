@@ -29,6 +29,8 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import Image from "next/image"
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"
+import { storage } from "@/lib/firebase"
 
 const AVAILABLE_CATEGORIES = [
   "Yeni Gelenler",
@@ -171,23 +173,16 @@ export default function AdminDashboardPage() {
     }))
   }
 
-  // Upload a single file to local server public directory
+  // Upload a single file directly to persistent Firebase Storage
   const uploadSingleImage = async (file: File): Promise<string | null> => {
     try {
-      const formData = new FormData()
-      formData.append("file", file)
-
-      const data = await apiFetch("/uploads", {
-        method: "POST",
-        body: formData,
-      })
-
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL 
-        ? process.env.NEXT_PUBLIC_API_URL.replace("/api", "") 
-        : "http://localhost:3001";
-      return `${backendUrl}${data.url}`;
+      const fileName = `product-${Date.now()}-${Math.floor(Math.random() * 1000000000)}.${file.name.split('.').pop()}`;
+      const storageRef = ref(storage, `products/${fileName}`);
+      const uploadTask = await uploadBytesResumable(storageRef, file);
+      const downloadURL = await getDownloadURL(uploadTask.ref);
+      return downloadURL;
     } catch (e: any) {
-      console.error(`Local upload failed for file ${file.name}:`, e)
+      console.error(`Firebase upload failed for file ${file.name}:`, e)
       toast.error(`"${file.name}" görseli yüklenirken hata oluştu: ${e.message || "Bilinmeyen hata"}`)
       return null
     }
