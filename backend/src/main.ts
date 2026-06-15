@@ -14,9 +14,9 @@ async function bootstrap() {
   // Set global API prefix
   app.setGlobalPrefix('api');
 
-  // Parse JSON and URL-encoded bodies (needed for iyzico callback)
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  // Parse JSON and URL-encoded bodies (needed for iyzico/paytr callback and base64 uploads)
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
   // Serve static uploads
   app.useStaticAssets(join(process.cwd(), 'uploads'), {

@@ -173,43 +173,75 @@ export default function AdminDashboardPage() {
     }))
   }
 
-  // Upload a single file directly to persistent Firebase Storage
-  const uploadSingleImage = async (file: File): Promise<string | null> => {
-    try {
-      const fileName = `product-${Date.now()}-${Math.floor(Math.random() * 1000000000)}.${file.name.split('.').pop()}`;
-      const storageRef = ref(storage, `products/${fileName}`);
-      const uploadTask = await uploadBytesResumable(storageRef, file);
-      const downloadURL = await getDownloadURL(uploadTask.ref);
-      return downloadURL;
-    } catch (e: any) {
-      console.error(`Firebase upload failed for file ${file.name}:`, e)
-      toast.error(`"${file.name}" görseli yüklenirken hata oluştu: ${e.message || "Bilinmeyen hata"}`)
-      return null
-    }
+  // Compress and convert file to Base64 data URL
+  const compressAndGetBase64 = (file: File): Promise<string | null> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (event) => {
+        const img = new window.Image()
+        img.src = event.target?.result as string
+        img.onload = () => {
+          const canvas = document.createElement("canvas")
+          let width = img.width
+          let height = img.height
+          
+          // Max size 800px to keep base64 string small
+          const MAX_SIZE = 800
+          if (width > height) {
+            if (width > MAX_SIZE) {
+              height = Math.round((height * MAX_SIZE) / width)
+              width = MAX_SIZE
+            }
+          } else {
+            if (height > MAX_SIZE) {
+              width = Math.round((width * MAX_SIZE) / height)
+              height = MAX_SIZE
+            }
+          }
+          
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext("2d")
+          ctx?.drawImage(img, 0, 0, width, height)
+          
+          // Compress to JPEG with 0.7 quality
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.7)
+          resolve(dataUrl)
+        }
+        img.onerror = () => {
+          resolve(null)
+        }
+      }
+      reader.onerror = () => {
+        resolve(null)
+      }
+    })
   }
 
-  // Handle instant image uploads on file input change
+  // Handle instant image compression and local state assignment on file input change
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
 
     setUploadingImage(true)
-    const toastId = toast.loading("Görseller yükleniyor...")
+    const toastId = toast.loading("Görseller işleniyor...")
     try {
-      const uploadedUrls: string[] = []
+      const processedUrls: string[] = []
       for (const file of files) {
-        const url = await uploadSingleImage(file)
-        if (url) uploadedUrls.push(url)
+        const url = await compressAndGetBase64(file)
+        if (url) processedUrls.push(url)
       }
       
-      if (uploadedUrls.length > 0) {
-        setProductImages(prev => [...prev, ...uploadedUrls])
-        toast.success(`${uploadedUrls.length} yeni görsel başarıyla yüklendi.`, { id: toastId })
+      if (processedUrls.length > 0) {
+        setProductImages(prev => [...prev, ...processedUrls])
+        toast.success(`${processedUrls.length} yeni görsel başarıyla eklendi.`, { id: toastId })
       } else {
-        toast.error("Görsel yüklenemedi.", { id: toastId })
+        toast.error("Görsel işlenemedi.", { id: toastId })
       }
     } catch (err) {
-      toast.error("Görseller yüklenirken hata oluştu.", { id: toastId })
+      console.error("Compression failed:", err)
+      toast.error("Görseller işlenirken hata oluştu.", { id: toastId })
     } finally {
       setUploadingImage(false)
       // Reset input value to allow selecting same files again
