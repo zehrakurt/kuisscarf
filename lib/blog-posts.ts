@@ -23,7 +23,7 @@ export const blogPosts: BlogPost[] = [
     category: "Kumaş Rehberi",
     author: "Fatmatüzzehra Kurt",
     authorRole: "Kuisscarf Kurucusu",
-    image: "/images/1.png",
+    image: "/images/blog-fabric-guide.png",
     keywords: "modal şal özellikleri, ipek şal özellikleri, pamuk şal, en kullanışlı şal kumaşı, kuisscarf şal modelleri, şal kumaşları",
     tags: ["Modal Şal", "İpek Şal", "Pamuk Şal", "Kumaş Analizi"],
     content: `
@@ -67,7 +67,7 @@ export const blogPosts: BlogPost[] = [
     category: "Bakım & Temizlik",
     author: "Fatmatüzzehra Kurt",
     authorRole: "Kuisscarf Kurucusu",
-    image: "/images/2.png",
+    image: "/images/blog-wash-care.png",
     keywords: "ipek şal nasıl yıkanır, modal şal temizliği, şal ütüleme teknikleri, şal bakımı, kuisscarf temizlik",
     tags: ["Şal Temizliği", "İpek Şal Bakımı", "Modal Şal Bakımı", "Pratik Bilgiler"],
     content: `
@@ -112,7 +112,7 @@ export const blogPosts: BlogPost[] = [
     category: "Kombin & Stil",
     author: "Fatmatüzzehra Kurt",
     authorRole: "Kuisscarf Kurucusu",
-    image: "/images/3.png",
+    image: "/images/blog-styling-tips.png",
     keywords: "şal bağlama modelleri, pratik şal modelleri, şal kombinleri, günlük şal stilleri, kuisscarf şal modelleri",
     tags: ["Şal Kombinleri", "Bağlama Stilleri", "Trendler", "Pratik Stil"],
     content: `
