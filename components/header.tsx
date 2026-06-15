@@ -21,7 +21,7 @@ const navigation = [
   { name: "Gucci Şal", href: "/shop?category=Gucci%20Şal" },
   { name: "Dior Şal", href: "/shop?category=Dior%20Şal" },
   { name: "Coach Şal", href: "/shop?category=Coach%20Şal" },
-  { name: "Blog", href: "/#blog" },
+  { name: "Blog", href: "/blog" },
 ]
 
 export function Header() {

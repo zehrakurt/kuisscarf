@@ -25,6 +25,7 @@ const footerLinks = {
     { name: "Sıkça Sorulan Sorular", href: "/support?tab=faq" },
     { name: "Kargo Bilgileri", href: "/support?tab=kargo" },
     { name: "İletişim", href: "/support?tab=iletisim" },
+    { name: "Blog / Stil Rehberi", href: "/blog" },
   ],
 }
 

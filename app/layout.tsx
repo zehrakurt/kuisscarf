@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Cormorant_Garamond, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/context/cart-context'
+import { FavoritesProvider } from '@/context/favorites-context'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({ 
@@ -16,10 +17,31 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://kuisscarf.com.tr'),
   title: 'Kuisscarf | Premium Hijab & Şal Koleksiyonu',
-  description: 'En kaliteli ipek, pamuk ve modal şallar. Türkiye\'nin en şık hijab markası. Ücretsiz kargo ve hızlı teslimat.',
-  keywords: 'hijab, şal, eşarp, ipek şal, modal şal, pamuk şal, tesettür, başörtüsü',
+  description: 'En kaliteli ipek, pamuk ve modal şallar. Türkiye\'nin en şık ve kaliteli hijab markası. Ücretsiz kargo ve hızlı teslimat.',
+  keywords: 'hijab, şal, eşarp, ipek şal, modal şal, pamuk şal, tesettür, başörtüsü, kuisscarf şal modelleri',
   generator: 'v0.app',
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: 'Kuisscarf | Premium Hijab & Şal Koleksiyonu',
+    description: 'En kaliteli ipek, pamuk ve modal şallar. Türkiye\'nin en şık ve kaliteli hijab markası. Ücretsiz kargo ve hızlı teslimat.',
+    url: 'https://kuisscarf.com.tr',
+    siteName: 'Kuisscarf',
+    locale: 'tr_TR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Kuisscarf | Premium Hijab & Şal Koleksiyonu',
+    description: 'En kaliteli ipek, pamuk ve modal şallar. Türkiye\'nin en şık ve kaliteli hijab markası.',
+  },
   icons: {
     icon: [
       {
@@ -33,13 +55,11 @@ export const metadata: Metadata = {
       {
         url: '/icon.svg',
         type: 'image/svg+xml',
-        },
-      ],
-      apple: '/apple-icon.png',
-    },
-  }
-  
-  import { FavoritesProvider } from '@/context/favorites-context'
+      },
+    ],
+    apple: '/apple-icon.png',
+  },
+}
 
   export default function RootLayout({
     children,
