@@ -56,7 +56,7 @@ export function CartSheet() {
             </div>
           ) : (
             cartItems.map((item) => (
-              <div key={item.id} className="flex gap-4 items-start pb-6 border-b border-border/50 last:border-b-0 last:pb-0">
+              <div key={`${item.id}-${item.variant || ""}`} className="flex gap-4 items-start pb-6 border-b border-border/50 last:border-b-0 last:pb-0">
                 {/* Item Image */}
                 <div className="relative h-20 w-16 rounded bg-muted overflow-hidden flex-shrink-0">
                   <Image
@@ -70,19 +70,22 @@ export function CartSheet() {
                 {/* Item Info */}
                 <div className="flex-1 min-w-0 space-y-1">
                   <h4 className="text-sm font-medium text-foreground truncate">{item.name}</h4>
+                  {item.variant && (
+                    <p className="text-xs text-muted-foreground">Seçenek: {item.variant}</p>
+                  )}
                   <p className="text-sm font-semibold text-primary">{item.price}₺</p>
                   
                   {/* Quantity Controls */}
                   <div className="flex items-center gap-1 mt-2">
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => updateQuantity(item.id, item.quantity - 1, item.variant)}
                       className="h-8 w-8 rounded-full border border-border flex items-center justify-center hover:bg-muted text-muted-foreground transition-colors"
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
                     <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.id, item.quantity + 1, item.variant)}
                       className="h-8 w-8 rounded-full border border-border flex items-center justify-center hover:bg-muted text-muted-foreground transition-colors"
                     >
                       <Plus className="h-3.5 w-3.5" />
@@ -92,7 +95,7 @@ export function CartSheet() {
 
                 {/* Remove Button */}
                 <button
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(item.id, item.variant)}
                   className="p-1 text-muted-foreground hover:text-destructive transition-colors"
                   aria-label="Ürünü sil"
                 >

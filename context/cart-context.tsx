@@ -9,13 +9,14 @@ export interface CartItem {
   image: string
   quantity: number
   slug?: string
+  variant?: string
 }
 
 interface CartContextType {
   cartItems: CartItem[]
   addToCart: (item: Omit<CartItem, "quantity">, quantity?: number) => void
-  removeFromCart: (id: string) => void
-  updateQuantity: (id: string, quantity: number) => void
+  removeFromCart: (id: string, variant?: string) => void
+  updateQuantity: (id: string, quantity: number, variant?: string) => void
   clearCart: () => void
   cartCount: number
   cartTotal: number
@@ -49,27 +50,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = (newItem: Omit<CartItem, "quantity">, qty = 1) => {
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === newItem.id)
+      const existingItem = prevItems.find(
+        (item) => item.id === newItem.id && item.variant === newItem.variant
+      )
       if (existingItem) {
         return prevItems.map((item) =>
-          item.id === newItem.id ? { ...item, quantity: item.quantity + qty } : item
+          item.id === newItem.id && item.variant === newItem.variant
+            ? { ...item, quantity: item.quantity + qty }
+            : item
         )
       }
       return [...prevItems, { ...newItem, quantity: qty }]
     })
   }
 
-  const removeFromCart = (id: string) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id))
+  const removeFromCart = (id: string, variant?: string) => {
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => !(item.id === id && item.variant === variant))
+    )
   }
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = (id: string, quantity: number, variant?: string) => {
     if (quantity <= 0) {
-      removeFromCart(id)
+      removeFromCart(id, variant)
       return
     }
     setCartItems((prevItems) =>
-      prevItems.map((item) => (item.id === id ? { ...item, quantity } : item))
+      prevItems.map((item) =>
+        item.id === id && item.variant === variant ? { ...item, quantity } : item
+      )
     )
   }
 

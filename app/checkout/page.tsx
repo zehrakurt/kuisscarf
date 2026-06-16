@@ -240,7 +240,7 @@ export default function CheckoutPage() {
               {/* Items List */}
               <div className="divide-y divide-border/50 max-h-80 overflow-y-auto pr-2">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
+                  <div key={`${item.id}-${item.variant || ""}`} className="flex gap-4 py-4 first:pt-0 last:pb-0">
                     <div className="relative h-16 w-12 rounded bg-muted overflow-hidden flex-shrink-0">
                       <Image
                         src={item.image}
@@ -251,7 +251,12 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-medium truncate">{item.name}</h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">Adet: {item.quantity}</p>
+                      <div className="flex flex-col gap-0.5 mt-0.5">
+                        {item.variant && (
+                          <p className="text-xs text-primary font-medium">Seçenek: {item.variant}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground">Adet: {item.quantity}</p>
+                      </div>
                     </div>
                     <div className="text-sm font-semibold text-foreground">{item.price * item.quantity}₺</div>
                   </div>

@@ -70,6 +70,7 @@ export default function AdminDashboardPage() {
     image: "",
     additionalImages: "",
     colors: "",
+    variants: "",
     isNew: false,
     isBestseller: false,
     category: "Yeni Gelenler",
@@ -173,75 +174,44 @@ export default function AdminDashboardPage() {
     }))
   }
 
-  // Compress and convert file to Base64 data URL
-  const compressAndGetBase64 = (file: File): Promise<string | null> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = (event) => {
-        const img = new window.Image()
-        img.src = event.target?.result as string
-        img.onload = () => {
-          const canvas = document.createElement("canvas")
-          let width = img.width
-          let height = img.height
-          
-          // Max size 800px to keep base64 string small
-          const MAX_SIZE = 800
-          if (width > height) {
-            if (width > MAX_SIZE) {
-              height = Math.round((height * MAX_SIZE) / width)
-              width = MAX_SIZE
-            }
-          } else {
-            if (height > MAX_SIZE) {
-              width = Math.round((width * MAX_SIZE) / height)
-              height = MAX_SIZE
-            }
-          }
-          
-          canvas.width = width
-          canvas.height = height
-          const ctx = canvas.getContext("2d")
-          ctx?.drawImage(img, 0, 0, width, height)
-          
-          // Compress to JPEG with 0.7 quality
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.7)
-          resolve(dataUrl)
-        }
-        img.onerror = () => {
-          resolve(null)
-        }
-      }
-      reader.onerror = () => {
-        resolve(null)
-      }
-    })
+  // Upload a single file directly to persistent Firebase Storage
+  const uploadSingleImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileName = `product-${Date.now()}-${Math.floor(Math.random() * 1000000000)}.${file.name.split('.').pop()}`;
+      const storageRef = ref(storage, `products/${fileName}`);
+      const uploadTask = await uploadBytesResumable(storageRef, file);
+      const downloadURL = await getDownloadURL(uploadTask.ref);
+      return downloadURL;
+    } catch (e: any) {
+      console.error(`Firebase upload failed for file ${file.name}:`, e)
+      toast.error(`"${file.name}" görseli yüklenirken hata oluştu: ${e.message || "Bilinmeyen hata"}`)
+      return null
+    }
   }
 
-  // Handle instant image compression and local state assignment on file input change
+  // Handle instant image uploads on file input change
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
 
     setUploadingImage(true)
-    const toastId = toast.loading("Görseller işleniyor...")
+    const toastId = toast.loading("Görseller yükleniyor...")
     try {
-      const processedUrls: string[] = []
+      const uploadedUrls: string[] = []
       for (const file of files) {
-        const url = await compressAndGetBase64(file)
-        if (url) processedUrls.push(url)
+        const url = await uploadSingleImage(file)
+        if (url) uploadedUrls.push(url)
       }
       
-      if (processedUrls.length > 0) {
-        setProductImages(prev => [...prev, ...processedUrls])
-        toast.success(`${processedUrls.length} yeni görsel başarıyla eklendi.`, { id: toastId })
+      if (uploadedUrls.length > 0) {
+        setProductImages(prev => [...prev, ...uploadedUrls])
+        toast.success(`${uploadedUrls.length} yeni görsel başarıyla yüklendi.`, { id: toastId })
       } else {
-        toast.error("Görsel işlenemedi.", { id: toastId })
+        toast.error("Görsel yüklenemedi.", { id: toastId })
       }
     } catch (err) {
-      console.error("Compression failed:", err)
-      toast.error("Görseller işlenirken hata oluştu.", { id: toastId })
+      console.error("Upload failed:", err)
+      toast.error("Görseller yüklenirken hata oluştu.", { id: toastId })
     } finally {
       setUploadingImage(false)
       // Reset input value to allow selecting same files again
@@ -274,6 +244,7 @@ export default function AdminDashboardPage() {
       image: prod.image || "",
       additionalImages: "",
       colors: prod.colors ? prod.colors.join(", ") : "",
+      variants: prod.variants ? prod.variants.join(", ") : "",
       isNew: !!prod.isNew,
       isBestseller: !!prod.isBestseller,
       category: prod.category || "Yeni Gelenler",
@@ -317,6 +288,7 @@ export default function AdminDashboardPage() {
       image: "",
       additionalImages: "",
       colors: "",
+      variants: "",
       isNew: false,
       isBestseller: false,
       category: "Yeni Gelenler",
@@ -350,6 +322,11 @@ export default function AdminDashboardPage() {
         ? productForm.colors.split(",").map(c => c.trim()).filter(c => c.startsWith("#"))
         : ["#E8DCC4"]
 
+      // Parse variants string into array
+      const variantsArray = productForm.variants
+        ? productForm.variants.split(",").map(v => v.trim()).filter(Boolean)
+        : []
+
       const updatedProduct = {
         id: productForm.id,
         name: productForm.name,
@@ -358,6 +335,7 @@ export default function AdminDashboardPage() {
         image: finalImages[0], // Main image
         images: finalImages, // Array of all images
         colors: colorsArray,
+        variants: variantsArray,
         isNew: productForm.isNew,
         isBestseller: productForm.isBestseller,
         category: selectedCategories[0] || "Yeni Gelenler",
@@ -596,7 +574,12 @@ export default function AdminDashboardPage() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-semibold truncate text-foreground">{item.name}</p>
-                                <p className="text-[10px] text-muted-foreground">{item.price}₺ x {item.quantity}</p>
+                                <div className="flex flex-col gap-0.5">
+                                  {item.variant && (
+                                    <p className="text-[10px] text-primary font-medium">Seçenek: {item.variant}</p>
+                                  )}
+                                  <p className="text-[10px] text-muted-foreground">{item.price}₺ x {item.quantity}</p>
+                                </div>
                               </div>
                               <div className="text-xs font-semibold text-foreground">{item.price * item.quantity}₺</div>
                             </div>
@@ -882,6 +865,17 @@ export default function AdminDashboardPage() {
                           value={productForm.colors}
                           onChange={handleProductFormChange}
                           placeholder="#E8DCC4, #D2C2A4"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="prod-variants">Varyantlar / Seçenekler (Virgülle Ayrılmış, örn: 1, 2, 3)</Label>
+                        <Input
+                          id="prod-variants"
+                          name="variants"
+                          value={productForm.variants}
+                          onChange={handleProductFormChange}
+                          placeholder="1, 2, 3, S, M, L"
                         />
                       </div>
 

@@ -30,6 +30,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
   const { addToCart } = useCart()
   const [selectedColor, setSelectedColor] = useState(0)
   const [quantity, setQuantity] = useState(1)
+  const [selectedVariant, setSelectedVariant] = useState<string>("")
   const [activeImage, setActiveImage] = useState<string>(product?.image || "/images/placeholder.jpg")
   const { toggleFavorite, isFavorited } = useFavorites()
   const isFav = isFavorited(String(product?.id))
@@ -53,14 +54,19 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
 
   const handleAddToCart = () => {
     if (!product) return
+    if (product.variants && product.variants.length > 0 && !selectedVariant) {
+      toast.error("Lütfen bir seçenek/varyant seçin.")
+      return
+    }
     addToCart({
       id: String(product.id),
       name: product.name,
       price: product.price,
       image: product.image,
+      variant: selectedVariant || undefined,
     }, quantity)
     toast.success(`${product.name} sepete eklendi!`, {
-      description: `Miktar: ${quantity} adet`,
+      description: `${selectedVariant ? `Seçenek: ${selectedVariant}, ` : ""}Miktar: ${quantity} adet`,
       action: {
         label: "Sepete Git",
         onClick: () => {
@@ -249,6 +255,27 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                     ))}
                   </div>
                 </div>
+
+                {/* Variant Selection */}
+                {product.variants && product.variants.length > 0 && (
+                  <div className="space-y-3 animate-in fade-in duration-300">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
+                      Seçenek / Varyant
+                    </span>
+                    <select
+                      value={selectedVariant}
+                      onChange={(e) => setSelectedVariant(e.target.value)}
+                      className="w-full h-12 rounded-lg border border-border bg-card px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary text-foreground transition-all cursor-pointer"
+                    >
+                      <option value="">Seçim Yapınız</option>
+                      {product.variants.map((variant: string) => (
+                        <option key={variant} value={variant}>
+                          {variant}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 {/* Quantity and Cart button */}
                 <div className="space-y-3">
