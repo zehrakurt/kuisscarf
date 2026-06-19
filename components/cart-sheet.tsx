@@ -113,16 +113,36 @@ export function CartSheet() {
               <span className="text-muted-foreground">Toplam Tutar</span>
               <span className="font-semibold text-xl text-foreground">{cartTotal}₺</span>
             </div>
-            <p className="text-xs text-muted-foreground leading-normal">
-              Kargo ve vergiler ödeme adımında hesaplanır. Ödemeniz iyzico güvencesiyle 3D Secure olarak gerçekleştirilecektir.
-            </p>
-            <SheetClose asChild>
-              <Link href="/checkout" className="block w-full">
-                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-6 text-base font-medium tracking-wide">
-                  SİPARİŞİ TAMAMLA
+            
+            <div className="bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-lg p-3 text-xs leading-relaxed space-y-1">
+              <span className="font-semibold block text-amber-400">Güvenli Ödeme & Sipariş Bildirimi</span>
+              Siparişinizi kredi kartı, taksit veya kargo avantajlarıyla tamamlamak için lütfen **Shopier** veya **Dolap** dükkanlarımızı kullanın.
+            </div>
+
+            <div className="flex flex-col gap-2 pt-1">
+              <a 
+                href="https://www.shopier.com/kuisscarff" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-full block"
+              >
+                <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90 py-5 text-sm font-semibold tracking-wide flex items-center justify-center gap-2">
+                  <ShoppingBag className="h-4 w-4" />
+                  SHOPIER İLE SATIN AL
                 </Button>
-              </Link>
-            </SheetClose>
+              </a>
+
+              <a 
+                href="https://dolap.com/profil/kuisscarff" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-full block"
+              >
+                <Button variant="outline" className="w-full py-5 text-sm font-semibold tracking-wide flex items-center justify-center gap-2 border-primary text-primary hover:bg-primary/5">
+                  DOLAP İLE SATIN AL
+                </Button>
+              </a>
+            </div>
           </div>
         )}
       </SheetContent>

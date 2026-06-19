@@ -6,7 +6,6 @@ import { CollectionsGrid } from "@/components/collections-grid"
 import { ProductsSection } from "@/components/products-section"
 import { BannerSection } from "@/components/banner-section"
 import { TestimonialsSection } from "@/components/testimonials-section"
-import { InstagramFeed } from "@/components/instagram-feed"
 import { ContactSection } from "@/components/contact-section"
 import { Footer } from "@/components/footer"
 
@@ -21,7 +20,6 @@ export default function Home() {
       <ProductsSection />
       <BannerSection />
       <TestimonialsSection />
-      <InstagramFeed />
       <ContactSection />
       <Footer />
     </main>
