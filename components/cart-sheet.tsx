@@ -133,7 +133,7 @@ export function CartSheet() {
               </a>
 
               <a 
-                href="https://dolap.com/profil/kuisscarff" 
+                href="https://dolap.com/ara?q=%40kuisscarf" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="w-full block"

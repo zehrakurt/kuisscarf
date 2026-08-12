@@ -212,7 +212,7 @@ function SupportPageContent() {
                 </p>
                 <div className="flex gap-3 pt-2">
                   <a 
-                    href="https://dolap.com/profil/kuisscarf" 
+                    href="https://dolap.com/ara?q=%40kuisscarf" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-xs text-primary font-bold hover:underline"
@@ -221,7 +221,7 @@ function SupportPageContent() {
                   </a>
                   <span className="text-muted-foreground/40 text-xs">|</span>
                   <a 
-                    href="https://www.gardrops.com/kuisscarf" 
+                    href="https://www.gardrops.com/kuisstore-u-5353207" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-xs text-primary font-bold hover:underline"
