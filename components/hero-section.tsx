@@ -31,14 +31,14 @@ export function HeroSection() {
       {/* Content */}
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="max-w-2xl">
-          <p className="text-sm sm:text-base tracking-[0.3em] uppercase text-[#5C0612] mb-3 md:mb-4 font-semibold">
+          <p className="text-sm sm:text-base tracking-[0.3em] uppercase text-[#5C0612] [text-shadow:_0_1.5px_2px_rgba(255,255,255,0.9)] mb-3 md:mb-4 font-semibold">
             imannoor Koleksiyon 2026
           </p>
           <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-light leading-[1.1] mb-4 md:mb-6 text-balance text-black md:text-foreground">
             Zarafet <br />
             <span className="italic font-normal">Her Anınızda</span>
           </h1>
-          <p className="text-[15px] sm:text-base md:text-lg lg:text-xl text-black font-medium md:font-normal md:text-muted-foreground mb-6 md:mb-10 max-w-lg leading-relaxed">
+          <p className="text-[15px] sm:text-base md:text-lg lg:text-xl text-black font-semibold md:font-normal [text-shadow:_0_1.5px_2px_rgba(255,255,255,0.9)] md:[text-shadow:none] md:text-muted-foreground mb-6 md:mb-10 max-w-lg leading-relaxed">
             Premium kalite pamuk şallarla tarzınızı yansıtın. <br />
             Türkiye&apos;nin en seçkin hijab koleksiyonu.
           </p>
