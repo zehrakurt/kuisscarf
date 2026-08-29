@@ -29,8 +29,8 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import Image from "next/image"
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"
-import { storage } from "@/lib/firebase"
+
+
 
 const AVAILABLE_CATEGORIES = [
   "Yeni Gelenler",
@@ -174,16 +174,26 @@ export default function AdminDashboardPage() {
     }))
   }
 
-  // Upload a single file directly to persistent Firebase Storage
+  // Upload a single file to local server storage
   const uploadSingleImage = async (file: File): Promise<string | null> => {
     try {
-      const fileName = `product-${Date.now()}-${Math.floor(Math.random() * 1000000000)}.${file.name.split('.').pop()}`;
-      const storageRef = ref(storage, `products/${fileName}`);
-      const uploadTask = await uploadBytesResumable(storageRef, file);
-      const downloadURL = await getDownloadURL(uploadTask.ref);
-      return downloadURL;
+      const formData = new FormData()
+      formData.append("file", file)
+      
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}))
+        throw new Error(errData.error || `Sunucu hatası: ${response.status}`)
+      }
+
+      const data = await response.json()
+      return data.url
     } catch (e: any) {
-      console.error(`Firebase upload failed for file ${file.name}:`, e)
+      console.error(`Görsel yükleme hatası (${file.name}):`, e)
       toast.error(`"${file.name}" görseli yüklenirken hata oluştu: ${e.message || "Bilinmeyen hata"}`)
       return null
     }
