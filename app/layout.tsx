@@ -19,8 +19,8 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://kuisscarf.com.tr'),
   title: 'Kuisscarf | Premium Hijab & Şal Koleksiyonu',
-  description: 'En kaliteli ipek, pamuk ve modal şallar. Türkiye\'nin en şık ve kaliteli hijab markası. Ücretsiz kargo ve hızlı teslimat.',
-  keywords: 'hijab, şal, eşarp, ipek şal, modal şal, pamuk şal, tesettür, başörtüsü, kuisscarf şal modelleri',
+  description: 'En kaliteli ipek, pamuk ve modal şallar. Türkiye\'nin en şık ve kaliteli hijab markası Kuisscarf (Kuis Scarf). Ücretsiz kargo ve hızlı teslimat.',
+  keywords: 'kuisscarf, kuis scarf, kuis şal, hijab, şal, eşarp, ipek şal, modal şal, pamuk şal, tesettür, başörtüsü, kuisscarf şal modelleri',
   generator: 'v0.app',
   alternates: {
     canonical: '/',

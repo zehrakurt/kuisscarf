@@ -35,12 +35,12 @@ export function HeroSection() {
             imannoor Koleksiyon 2026
           </p>
           <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-light leading-[1.1] mb-4 md:mb-6 text-balance text-black md:text-foreground">
-            Zarafet <br />
-            <span className="italic font-normal">Her Anınızda</span>
+            Kuisscarf ile <br />
+            <span className="italic font-normal">Zarafet Her Anınızda</span>
           </h1>
           <p className="text-[15px] sm:text-base md:text-lg lg:text-xl text-black font-semibold md:font-normal [text-shadow:_0_1.5px_2px_rgba(255,255,255,0.9)] md:[text-shadow:none] md:text-muted-foreground mb-6 md:mb-10 max-w-lg leading-relaxed">
             Premium kalite pamuk şallarla tarzınızı yansıtın. <br />
-            Türkiye&apos;nin en seçkin hijab koleksiyonu.
+            Kuisscarf (Kuis Scarf) şık ve modern tesettür başörtüsü modelleri ile Türkiye&apos;nin en seçkin hijab koleksiyonunu sunuyor.
           </p>
           <div className="flex flex-col sm:flex-row items-start gap-4">
             <Button
