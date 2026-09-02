@@ -8,7 +8,7 @@ interface PageProps {
 async function getProduct(id: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://kuisscarf-backend.onrender.com/api'
   try {
-    const res = await fetch(`${baseUrl}/products/${id}`, { next: { revalidate: 300 } })
+    const res = await fetch(`${baseUrl}/products/${id}`, { cache: 'no-store' })
     if (!res.ok) return null
     return await res.json()
   } catch (err) {
@@ -20,7 +20,7 @@ async function getProduct(id: string) {
 async function getRelatedProducts(id: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://kuisscarf-backend.onrender.com/api'
   try {
-    const res = await fetch(`${baseUrl}/products`, { next: { revalidate: 300 } })
+    const res = await fetch(`${baseUrl}/products`, { cache: 'no-store' })
     if (!res.ok) return []
     const list = await res.json()
     return list.filter((p: any) => String(p.id) !== String(id)).slice(0, 4)

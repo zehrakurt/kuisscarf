@@ -20,6 +20,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const url = `${BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
   
   const response = await fetch(url, {
+    cache: 'no-store',
     ...options,
     headers,
   });

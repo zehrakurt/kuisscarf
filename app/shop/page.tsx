@@ -8,7 +8,7 @@ interface ShopPageProps {
 async function getProducts() {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://kuisscarf-backend.onrender.com/api'
   try {
-    const res = await fetch(`${baseUrl}/products`, { next: { revalidate: 300 } })
+    const res = await fetch(`${baseUrl}/products`, { cache: 'no-store' })
     if (!res.ok) return []
     return await res.json()
   } catch (err) {
