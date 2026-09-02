@@ -15,6 +15,16 @@ import { Footer } from "@/components/footer"
 
 const categories = ["Tümü", "Yeni Gelenler", "İmannoor Şal", "Gucci Şal", "Dior Şal", "Coach Şal", "İndirimli Ürünler"]
 
+const categorySeoDescriptions: Record<string, string> = {
+  "Tümü": "Kuisscarf en yeni şal modelleri, İmannoor şallar, lüks ipek, modal ve pamuklu başörtüsü çeşitleri. Türkiye'nin en seçkin tesettür şal koleksiyonunu keşfedin.",
+  "Yeni Gelenler": "Kuisscarf 2026 yeni sezon şal modelleri. En güncel renk ve kumaş trendlerine sahip yeni şallarımızı hemen inceleyin.",
+  "İmannoor Şal": "Özel dokulu İmannoor şal modelleri ve canlı renk seçenekleri Kuisscarf'ta. Kayma yapmayan, dökümlü ve şık İmannoor şal çeşitleri uygun fiyatlarla.",
+  "Gucci Şal": "Premium tasarım Gucci desenli şal modelleri ile kombinlerinize lüks bir dokunuş katın. Yumuşak ve nefes alan dokusuyla Kuisscarf Gucci şallar.",
+  "Dior Şal": "Zarif ve ikonik Dior desen şal modelleri. Özel günlerde ve günlük şıklığınızda göz kamaştıracak lüks tesettür şal koleksiyonu.",
+  "Coach Şal": "Modern ve spor-şık Coach desen şal modelleri. Kolay şekil alan, kırışmayan yapısı ile tarzınızı tamamlayın.",
+  "İndirimli Ürünler": "Fırsat ürünleri ve indirimli şal modelleri. Kaliteli ipek, modal ve pamuk şallara en avantajlı fiyatlarla sahip olun.",
+}
+
 interface ShopClientProps {
   initialProducts: any[]
 }
@@ -72,12 +82,17 @@ function ShopCatalogContent({ initialProducts }: ShopClientProps) {
 
   return (
     <div className="space-y-6">
-      {/* Centered, stylish Category Name Heading */}
-      <div className="flex flex-col items-center text-center py-6 mb-8">
-        <h2 className="text-3xl lg:text-4xl font-light tracking-[0.2em] text-foreground uppercase relative pb-4">
-          {searchVal ? `ARAMA: "${searchVal}"` : (activeCategory === "Tümü" ? "TÜM ÜRÜNLER" : activeCategory)}
+      {/* Centered, stylish Category Name Heading & SEO Text */}
+      <div className="flex flex-col items-center text-center py-6 mb-4 max-w-2xl mx-auto">
+        <h1 className="text-3xl lg:text-4xl font-light tracking-[0.2em] text-foreground uppercase relative pb-4">
+          {searchVal ? `ARAMA SONUÇLARI: "${searchVal}"` : (activeCategory === "Tümü" ? "KUISSCARF TÜM ŞAL KOLEKSİYONU" : `${activeCategory.toUpperCase()} MODELLERİ`)}
           <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-[2px] bg-primary" />
-        </h2>
+        </h1>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-4 leading-relaxed">
+          {searchVal 
+            ? `"${searchVal}" araması için bulunan şal modelleri ve fiyatları.` 
+            : (categorySeoDescriptions[activeCategory] || categorySeoDescriptions["Tümü"])}
+        </p>
       </div>
 
       {/* Products Grid */}
