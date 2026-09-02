@@ -174,7 +174,17 @@ export default function AdminDashboardPage() {
     }))
   }
 
-  // Upload a single file to local server storage
+  // Helper to read File as Base64 Data URL
+  const readFileAsDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = (err) => reject(err)
+      reader.readAsDataURL(file)
+    })
+  }
+
+  // Upload a single file to local server storage, with Base64 fallback if server upload fails
   const uploadSingleImage = async (file: File): Promise<string | null> => {
     try {
       const formData = new FormData()
@@ -185,27 +195,34 @@ export default function AdminDashboardPage() {
         body: formData,
       })
 
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}))
-        throw new Error(errData.error || `Sunucu hatası: ${response.status}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.url) return data.url
       }
-
-      const data = await response.json()
-      return data.url
+      
+      // Fallback: convert file to Base64 Data URL if server upload fails (e.g. read-only filesystem)
+      console.warn(`Server upload failed for ${file.name}, using Data URL fallback.`)
+      return await readFileAsDataUrl(file)
     } catch (e: any) {
-      console.error(`Görsel yükleme hatası (${file.name}):`, e)
-      toast.error(`"${file.name}" görseli yüklenirken hata oluştu: ${e.message || "Bilinmeyen hata"}`)
-      return null
+      console.warn(`Server upload error for ${file.name}, using Data URL fallback:`, e)
+      try {
+        return await readFileAsDataUrl(file)
+      } catch (err) {
+        console.error("Data URL conversion failed:", err)
+        toast.error(`"${file.name}" görseli okunamadı.`)
+        return null
+      }
     }
   }
 
   // Handle instant image uploads on file input change
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
+    const targetInput = e.target
+    const files = Array.from(targetInput.files || [])
     if (files.length === 0) return
 
     setUploadingImage(true)
-    const toastId = toast.loading("Görseller yükleniyor...")
+    const toastId = toast.loading("Görseller işleniyor...")
     try {
       const uploadedUrls: string[] = []
       for (const file of files) {
@@ -215,17 +232,18 @@ export default function AdminDashboardPage() {
       
       if (uploadedUrls.length > 0) {
         setProductImages(prev => [...prev, ...uploadedUrls])
-        toast.success(`${uploadedUrls.length} yeni görsel başarıyla yüklendi.`, { id: toastId })
+        toast.success(`${uploadedUrls.length} yeni görsel eklendi.`, { id: toastId })
       } else {
-        toast.error("Görsel yüklenemedi.", { id: toastId })
+        toast.error("Görsel eklenemedi.", { id: toastId })
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Upload failed:", err)
-      toast.error("Görseller yüklenirken hata oluştu.", { id: toastId })
+      toast.error("Görseller eklenirken hata oluştu.", { id: toastId })
     } finally {
       setUploadingImage(false)
-      // Reset input value to allow selecting same files again
-      e.target.value = ""
+      if (targetInput) {
+        targetInput.value = ""
+      }
     }
   }
 
@@ -338,8 +356,8 @@ export default function AdminDashboardPage() {
         : []
 
       const updatedProduct = {
-        id: productForm.id,
-        name: productForm.name,
+        id: String(productForm.id).trim(),
+        name: productForm.name.trim(),
         price: Number(productForm.price),
         originalPrice: productForm.originalPrice ? Number(productForm.originalPrice) : null,
         image: finalImages[0], // Main image
@@ -367,9 +385,9 @@ export default function AdminDashboardPage() {
       toast.success(editingProduct ? "Ürün güncellendi!" : "Yeni ürün eklendi!", { id: toastId })
       cancelEditProduct()
       loadProducts()
-    } catch (e) {
+    } catch (e: any) {
       console.error("Product Save Error:", e)
-      toast.error("Ürün kaydedilirken hata oluştu.", { id: toastId })
+      toast.error(`Ürün kaydedilirken hata oluştu: ${e.message || "Bilinmeyen hata"}`, { id: toastId })
     }
   }
 
@@ -625,13 +643,12 @@ export default function AdminDashboardPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleSaveProduct} className="space-y-4 text-sm">
+                    <form onSubmit={handleSaveProduct} noValidate className="space-y-4 text-sm">
                       <div className="space-y-1.5">
                         <Label htmlFor="prod-id">Ürün ID/Kod (Benzersiz Sayı) *</Label>
                         <Input
                           id="prod-id"
                           name="id"
-                          required
                           disabled={!!editingProduct}
                           value={productForm.id}
                           onChange={handleProductFormChange}
@@ -644,7 +661,6 @@ export default function AdminDashboardPage() {
                         <Input
                           id="prod-name"
                           name="name"
-                          required
                           value={productForm.name}
                           onChange={handleProductFormChange}
                           placeholder="Örn: Silk Kahve Şal"
@@ -658,7 +674,6 @@ export default function AdminDashboardPage() {
                             id="prod-price"
                             name="price"
                             type="number"
-                            required
                             value={productForm.price}
                             onChange={handleProductFormChange}
                             placeholder="389"
@@ -918,7 +933,14 @@ export default function AdminDashboardPage() {
                           disabled={uploadingImage}
                           className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
                         >
-                          KAYDET
+                          {uploadingImage ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Görsel İşleniyor...
+                            </>
+                          ) : (
+                            "KAYDET"
+                          )}
                         </Button>
                         {editingProduct && (
                           <Button
